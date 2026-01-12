@@ -45,22 +45,69 @@ NIO.2: Stands for New IO, and is a term that came into being with java 1.7, emph
     java.nio package, most importantly the java.nio.file package and its type.
     The NIO.2 introduced Path interface and file system types, and some helper classes such as Files, Paths, and
     FileSystem that do make some common functionality for working with operating system file systems much easier as well
-    as much efficient, delegating work to native system. 
-
-
-
-
-
-
-
-
+    as much efficient, delegating work to native system.
 
 
  */
 
-public class Main {
-    public static void main(String[] args) {
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
-        System.out.println("Hello, World!");
+public class Main {
+    public static void main(String[] args){
+
+        String fileName = "testing.scv";
+        testFile(fileName);
+        /*
+        LOOK in testFile()
+        Files.readAllLines(path) method throws an exception called IOException. This is a special kind of exception
+        called a Checked Exception. It's a parent class of many common exceptions we'll encounter when working with
+        external resources.
+        -> Checked Exception represents an anticipated or common problem that might occur. For Example, we can imagine
+           that a typo in the file name might be a common mistake, resulting in the system being unable to locate the
+           file. It's so common that java has a named exception for that situation, the FileNotFoundException, which is
+           a subclass of the IOException.
+
+        How do we handle the checked exception?
+        ----------------------------------------
+        There are two options,
+         1. We can wrap statement that throws a checked exception in a try catch block and then handle the situation in
+            the catch block.
+         2. Or we can change the method signature, declaring a throws clause and specifying the exception type.
+
+        We can use File class to check if the file exist or not.
+        LBYL or EAFP,
+
+        LBYL: "Look Before You Leap", this style of coding involves checking for errors before you perform an operation.
+        EAFP: "Easier to Ask Forgiveness than Permission". This assumes an operation will usually succeed, and then
+               handles any error that occurs, if they do occur.
+
+        How do we recognize a checked exception?
+          -> A checked exception means it will give you an error at the compiled time itself in the IDE.
+          -> An unchecked exception is an instance of a RuntimeException or one of its subclasses.
+         */
+        File file = new File(fileName);
+        if(!file.exists()){
+            System.out.println("Can't run until the file is exist");
+            System.out.println("Quiting application, go figure it out");
+            return;
+        }
+        System.out.println("We are good to go");
+    }
+
+    private static void testFile(String fileName){
+        Path path = Paths.get(fileName);
+        try{
+            List<String> lines = Files.readAllLines(path);
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }finally {
+            System.out.println("May be I would log something either way...");
+        }
+        System.out.println("File exists and able to use the resource");
     }
 }
