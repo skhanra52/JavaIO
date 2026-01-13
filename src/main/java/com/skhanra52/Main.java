@@ -51,17 +51,19 @@ NIO.2: Stands for New IO, and is a term that came into being with java 1.7, emph
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args){
 
         String fileName = "testing.scv";
-        testFile(fileName);
+//        testFile(fileName);
+//        testFile2(fileName);
+        testFile2(null);
         /*
         LOOK in testFile()
         Files.readAllLines(path) method throws an exception called IOException. This is a special kind of exception
@@ -97,17 +99,54 @@ public class Main {
             return;
         }
         System.out.println("We are good to go");
+
+        /*
+          -> Many of the types to read and write to files are instantiated using the new keyword.
+          -> Underneath the covers, the constructor opens the file resource, and it's important to close the resource
+             when we are done with it.
+          -> Using "try with resources" is the recommended approach, both to make your code more concise and to avail
+             yourself of java's build-in support for automatically closing resources with the try block.
+         */
     }
 
     private static void testFile(String fileName){
         Path path = Paths.get(fileName);
+        FileReader reader = null;
         try{
-            List<String> lines = Files.readAllLines(path);
+//            List<String> lines = Files.readAllLines(path);
+            reader = new FileReader(fileName);
         }catch (IOException e){
             throw new RuntimeException(e);
         }finally {
+            if(reader != null){
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             System.out.println("May be I would log something either way...");
         }
+        System.out.println("File exists and able to use the resource");
+    }
+
+    private static void testFile2(String fileName){
+        // surround a try with resources block.
+       try(FileReader reader = new FileReader(fileName)){
+           System.out.println("The file is "+reader);
+       } catch (FileNotFoundException e) {
+           System.out.println("File '" +fileName + "' does not exist.");
+           throw new RuntimeException(e);
+       } catch (NullPointerException | IllegalArgumentException e){
+           System.out.println("User has added bad data "+ e.getMessage());
+       }
+       catch (IOException e) {
+           throw new RuntimeException(e);
+       } catch (Exception e){
+           System.out.println("Something unrelated and unexpected happened.");
+       }finally {
+           System.out.println("May be I would log something else either way..........");
+       }
         System.out.println("File exists and able to use the resource");
     }
 }
