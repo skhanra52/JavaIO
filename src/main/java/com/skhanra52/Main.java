@@ -54,16 +54,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class Main {
     public static void main(String[] args){
 
-        String fileName = "testing.scv";
-//        testFile(fileName);
-//        testFile2(fileName);
-        testFile2(null);
         /*
         LOOK in testFile()
         Files.readAllLines(path) method throws an exception called IOException. This is a special kind of exception
@@ -92,13 +86,6 @@ public class Main {
           -> A checked exception means it will give you an error at the compiled time itself in the IDE.
           -> An unchecked exception is an instance of a RuntimeException or one of its subclasses.
          */
-        File file = new File(fileName);
-        if(!file.exists()){
-            System.out.println("Can't run until the file is exist");
-            System.out.println("Quiting application, go figure it out");
-            return;
-        }
-        System.out.println("We are good to go");
 
         /*
           -> Many of the types to read and write to files are instantiated using the new keyword.
@@ -107,10 +94,58 @@ public class Main {
           -> Using "try with resources" is the recommended approach, both to make your code more concise and to avail
              yourself of java's build-in support for automatically closing resources with the try block.
          */
+
+        /*
+            Legacy(io):---------------------
+            java.io.File;
+            java.io.FileReader; -----------> AutoClosable
+
+            -> The File class and FileReader class are part of Java since version 1.
+            -> The FileReader class implements the AutoClosable interface through the parent class Reader. This class
+               open a file implicitly.
+            -> In contrast, when we are creating an instance of a File, we are not actually opening it. Instead, we are
+               working with something called file handler, that let us perform OS-like operation.
+
+           File Handle vs File Resource:
+           -------------------------------------------------------------
+           A File Handle is a reference to a file that is used by the operating system to keep track of the file.
+           It's an abstract representation of the file, and it does not contain any of the actual data from the file.
+
+           A File Resource, on the other hand, is the actual data from the file.
+           It is stored on desk, and it can be accessed by the operating system and by application.
+
+
+         */
+
+        File file = getFile();
+        if(!file.exists()){
+            System.out.println("Can't run until the file is exist");
+            return;
+        }
+        System.out.println("We are good to go");
+
+    }
+
+    private static File getFile() {
+        System.out.println("Current working directory (cwd): "+new File("").getAbsolutePath());
+        // Listing the root directory.
+        for(File f : File.listRoots()){
+            System.out.println("Root directory: "+f);
+        }
+//        String fileName = "files/testing.csv";
+        String fileName = "testing.csv";
+        String fileName2 = "testing2.csv";
+//        testFile(fileName);
+//        testFile2(fileName);
+//        testFile2(null);
+//        return new File(fileName);
+        // moved the testing file from the "Desktop/Java/FileExceptions/files" to "/Users/sumankalyankhanra/Desktop"
+//        return new File("/Users/sumankalyankhanra/Desktop", fileName);
+        return new File(".", fileName2); // need to check this logic, how the . is working here
     }
 
     private static void testFile(String fileName){
-        Path path = Paths.get(fileName);
+//        Path path = Paths.get(fileName);
         FileReader reader = null;
         try{
 //            List<String> lines = Files.readAllLines(path);
@@ -130,6 +165,7 @@ public class Main {
         System.out.println("File exists and able to use the resource");
     }
 
+    // Example of try with resource
     private static void testFile2(String fileName){
         // surround a try with resources block.
        try(FileReader reader = new FileReader(fileName)){
