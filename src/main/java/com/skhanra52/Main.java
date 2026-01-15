@@ -54,6 +54,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Main {
     public static void main(String[] args){
@@ -118,11 +121,34 @@ public class Main {
          */
 
         File file = getFile();
+        System.out.println(file.getAbsolutePath());
         if(!file.exists()){
             System.out.println("Can't run until the file is exist");
             return;
         }
         System.out.println("We are good to go");
+
+        /*
+            File System concept:
+            --------------------------------------------
+            -> A "directory(or Folder)" is a file system container for other directories ot files.
+            -> A "path" is either a directory or a filename and may include information about parent directories or folder.
+            -> A "root directory" is the top level directory in the file system.
+            -> The "current working directory" is the directory where the current process is working in or running from.
+            -> An "Absolute path" includes the root(by either starting with / or optionally, C:\ in windows)
+            -> A "relative path" defines a path relative to the current working directory, and therefore would not start
+               with /, but may optionally start with dot . then a file separator character.
+         */
+
+        // using nio2 ------------------------
+        Path path = Paths.get("files/testing2.csv");
+        System.out.println(file.getAbsolutePath());
+        if(!Files.exists(path)){
+            System.out.println("2. Can't run until the file is exist");
+            return;
+        }
+        System.out.println("2. We are good to go");
+
 
     }
 
@@ -134,14 +160,15 @@ public class Main {
         }
 //        String fileName = "files/testing.csv";
         String fileName = "testing.csv";
-        String fileName2 = "testing2.csv";
+        String fileName2 = "files/testing2.csv";
 //        testFile(fileName);
 //        testFile2(fileName);
 //        testFile2(null);
 //        return new File(fileName);
         // moved the testing file from the "Desktop/Java/FileExceptions/files" to "/Users/sumankalyankhanra/Desktop"
-//        return new File("/Users/sumankalyankhanra/Desktop", fileName);
-        return new File(".", fileName2); // need to check this logic, how the . is working here
+//        return new File("/Users/sumankalyankhanra/Desktop", fileName); // provided absolute path to access the file.
+        return new File(".", fileName2); // We will get /Users/sumankalyankhanra/Desktop/Java/FileExceptions/./files/testing2.csv
+        // This is called redundant name element.
     }
 
     private static void testFile(String fileName){
