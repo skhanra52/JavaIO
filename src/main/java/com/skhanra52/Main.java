@@ -150,6 +150,10 @@ public class Main {
         System.out.println("2. We are good to go");
 
 
+        useFile("files/testing2.csv"); // it read the existing file from the directory.
+        usePath("pathFile.txt"); // it has created the pathFile.txt in the first run.
+
+
     }
 
     private static File getFile() {
@@ -211,5 +215,65 @@ public class Main {
            System.out.println("May be I would log something else either way..........");
        }
         System.out.println("File exists and able to use the resource");
+    }
+
+    // used older File type
+    private static void useFile(String filename){
+        File file = new File(filename);
+        boolean fileExist = file.exists();
+
+        System.out.printf("File '%s' %s %n", filename, fileExist? "exists.":"does not exist.");
+
+        if(fileExist){
+            System.out.println("Deleting the file: "+filename);
+            fileExist = !file.delete();
+        }
+
+        if(!fileExist){
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                System.out.println("Something went wrong.");
+            }
+            System.out.println("Created file: "+filename);
+            if(file.canWrite()){
+                System.out.println("Would write to file here..");
+            }
+        }
+    }
+
+    private static void usePath(String filename){
+        Path path = Path.of(filename);
+        boolean fileExist = Files.exists(path);
+
+        System.out.printf("File '%s' %s %n", filename, fileExist? "exists.":"does not exist.");
+
+        if(fileExist){
+            System.out.println("Deleting the file: "+filename);
+            try {
+               Files.delete(path);
+                fileExist = false;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(!fileExist){
+            try {
+                Files.createFile(path);
+                System.out.println("Created file: "+filename);
+                if(Files.isWritable(path)){
+                    Files.writeString(path, """
+                            I am writing some text here.
+                            This is just the sample.
+                            """);
+            }
+                System.out.println("I am read too");
+                System.out.println("-----------------------------");
+                Files.readAllLines(path).forEach(System.out::println);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     }
 }
