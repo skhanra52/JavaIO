@@ -150,8 +150,52 @@ public class Main {
         System.out.println("2. We are good to go");
 
 
-        useFile("files/testing2.csv"); // it read the existing file from the directory.
-        usePath("pathFile.txt"); // it has created the pathFile.txt in the first run.
+        useFile("files/testing2.csv"); // It read the existing file from the directory. It is taking file name as param.
+        usePath("pathFile.txt"); // It has created the pathFile.txt in the first run. It actually takes path as param.
+        /*
+          In the above, useFile() method takes the "file name" as an argument and uses the old File class after instantiate
+          the File object. This is the older version of checking whether the file exist or not, creating files etc.
+          In the other hand, we also have path, usePath() method takes the path as an argument and directly uses the
+          File static methods which are all takes path as an argument and perform all the common functions.
+
+          Functionality in Common:
+          --------------------------------------------------------------------------------------------------------------
+          Functionality                 |  File instance methods           | File static methods, with path argument
+                                        |  File class                      | Files class (File ending with s)
+          --------------------------------------------------------------------------------------------------------------
+          1. create file                | createNewFile()                  | createFile(Path p)
+          2. delete directory of  file  | delete()                         | File.delete(Path p) / deleteIfExist(Path p)
+          3. check path type            | isDirectory() / isFile()         | isDirectory(Path p) / isRegularFile(Path p)
+          4. get byte size of the file  | length()                         | size(Path p)
+          5. List directory contents    | listFiles                        | list(Path p)
+          6. create directory or        | mkdir() or mkdirs()              | createDirectory(Path p)
+                directories             |                                  | or createDirectories(Path p)
+          7. Rename                     | renameTo(File destination)       | move(Path src, Path destination)
+          etc...
+
+          Note: If we need to support legacy code or if we need to be backward compatible to a version of JDK that's
+                older than JDK7, we can still rely on "File" class.
+                If we are starting new, then probably we can use the "Files"(its Files, ending with s) class and path
+                instance, otherwise, known as the nio2 ways of doing things.
+
+           => NIO.2 file operations have been improved:
+           -------------------------------------------------------------------------------------------------------------
+           The NIO.2 type includes the support for:
+            -> Asynchronous file I/O operations.
+            -> File locking, including more regular locking. This means, instead of locking entire file a region of it
+                can be locked.
+            -> File metadata retrieval.
+            -> Symbolic link manipulation.
+            -> File system notifications. This means changes occurring on a path can be made watchable to register
+                services.
+
+            => NIO.2 file operations perform better:
+            ------------------------------------------------------------------------------------------------------------
+             -> NIO.2 type are non-blocking, meaning asynchronous access to resources by multiple threads is supported.
+             -> They manage memory more efficiently, reading and writing directly to and from memory in to buffers,
+                through something called a FileChannel.
+             -> We can also read from or write to multiple buffers in a single operation.
+         */
 
 
     }
@@ -271,9 +315,15 @@ public class Main {
                 System.out.println("I am read too");
                 System.out.println("-----------------------------");
                 Files.readAllLines(path).forEach(System.out::println);
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
+
+    private static void printPathInfo(Path path){
+        System.out.println("Path: "+path);
+        System.out.println("fileName: "+path.getFileName());
+        System.out.println("Parent: "+path.getParent());
     }
 }
