@@ -57,6 +57,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.Instant;
 
 public class Main {
     public static void main(String[] args){
@@ -197,6 +199,10 @@ public class Main {
              -> We can also read from or write to multiple buffers in a single operation.
          */
 
+        System.out.println("--------------------------------------------------");
+        printPathInfo(path);
+        Path path2 = Paths.get("files/testing3.csv");
+        losStatement(path2);
 
     }
 
@@ -321,9 +327,59 @@ public class Main {
         }
     }
 
+    /**
+     * Describe various methods of path available to read the path, filename, directory, absolute path etc.
+     * @param path file path.
+     */
     private static void printPathInfo(Path path){
         System.out.println("Path: "+path);
         System.out.println("fileName: "+path.getFileName());
         System.out.println("Parent: "+path.getParent());
+        Path absolutePath = path.toAbsolutePath();
+        System.out.println("Absolute path: "+absolutePath);
+        System.out.println("Absolute path root: "+absolutePath.getRoot());
+        System.out.println("Root: "+path.getRoot());
+        System.out.println("isAbsolute: "+path.isAbsolute());
+
+        // Starting from root iterating over the path to get the subFolders in it.
+        // printing the root separately as it does not include in absolute path.
+         System.out.println(absolutePath.getRoot());
+//         int i = 1;
+//         var it = path.toAbsolutePath().iterator();
+//         while (it.hasNext()){
+//             System.out.println(".".repeat(i++)+" "+it.next());
+//         }
+
+        // Without iterating through the path using .iterate(), we can use the path method available to use to loop
+        // through directory tree.
+        int pathParts = absolutePath.getNameCount();
+        // System.out.println(pathParts);
+        for(int j=0; j< pathParts; j++){
+            // using ".getName()" we get more flexibility while iterating through the file tree.
+            System.out.println(".".repeat(j+1) + " "+absolutePath.getName(j)); // Gives directory name each time
+        }
+
+
+        System.out.println("--------------------------------------------------");
+    }
+
+    /**
+     *  Creates the directory if not preset, also create and write to file directly.
+     * @param path File path passed in to method.
+     */
+    private static void losStatement(Path path){
+        try{
+            Path parent = path.getParent();
+            if(!Files.exists(parent)){
+                Files.createDirectories(parent); // creating the folder is not exist.
+            }
+            // creating and writing in the file using single line. First argument is path, second argument is the string
+            // that will be printed. This also takes 3rd argument which is a variable length option types.
+            // Here, we are using two options StandardOpenOption.CREATE, StandardOpenOption.APPEND
+            Files.writeString(path, Instant.now() +": Hello File world\n",
+                    StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
