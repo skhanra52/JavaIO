@@ -59,6 +59,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args){
@@ -201,8 +202,18 @@ public class Main {
 
         System.out.println("--------------------------------------------------");
         printPathInfo(path);
-        Path path2 = Paths.get("files/testing3.csv");
-        losStatement(path2);
+        // Initially the "files/testing3.csv" not present and the folder(directory) "files" and file "testing3.csv"
+        // will be created using "Files.createDirectory()" method from "Files" class.
+//        Path path2 = Path.of("files/testing3.csv");
+//        losStatement(path2);
+        // In the below path the entire directory is not present in the file structure. So directory has to get created
+        // first and then the file will get created.
+        System.out.println("----------Testing path for testing4.txt--------------------");
+        Path path3 = Path.of("testDirectory/testFile/testing4.txt");
+        printPathInfo(path3);
+        losStatement(path3);
+        System.out.println("--------OS Path related information, varies as per OS-----------------------");
+        extraInfo(path3);
 
     }
 
@@ -358,8 +369,6 @@ public class Main {
             // using ".getName()" we get more flexibility while iterating through the file tree.
             System.out.println(".".repeat(j+1) + " "+absolutePath.getName(j)); // Gives directory name each time
         }
-
-
         System.out.println("--------------------------------------------------");
     }
 
@@ -371,13 +380,29 @@ public class Main {
         try{
             Path parent = path.getParent();
             if(!Files.exists(parent)){
-                Files.createDirectories(parent); // creating the folder is not exist.
+                // Files.createDirectory(parent); // creates single directory, ex: "files/testing3.csv", see in main method
+                // below line of code creates the entire folders(directories)which are not exist along with file testing4.csv.
+                Files.createDirectories(parent);
             }
             // creating and writing in the file using single line. First argument is path, second argument is the string
             // that will be printed. This also takes 3rd argument which is a variable length option types.
             // Here, we are using two options StandardOpenOption.CREATE, StandardOpenOption.APPEND
             Files.writeString(path, Instant.now() +": Hello File world\n",
                     StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Provides OS specific attributes information about the file like lastAccessTime, lastModifiedTime etc.
+     * @param path of the file.
+     */
+    private static void extraInfo(Path path){
+        try{
+            Map<String, Object> attr = Files.readAttributes(path,"*");
+            attr.entrySet().forEach(System.out::println);
+            System.out.println(Files.probeContentType(path)); // Gives the content type of the file, ex: test/plain
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
