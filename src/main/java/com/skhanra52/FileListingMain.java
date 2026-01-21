@@ -19,15 +19,17 @@ public class FileListingMain {
         // Created variable called "path" using empty string, which gives current working directory.
         Path path = Path.of("");
         System.out.println("cwd: "+path.toAbsolutePath());
+        /*
+         Printing full path of current directory. It's same as "ls" command in the macOS/Linux terminal.
+         This method returns a stream of path instances, each path representing either a file or a directory/folder or
+         sub-folder and that going to be an element of stream called "paths" which has a type "Path".
+         -> Stream<Path> paths = Files.list(path); If we use this under the normal try block it would through a warning
+         as "'Stream<Path>' used without 'try'-with-resources statement" that is because the "Files.list(path)" returns
+         an stream, so it required a terminal operation which would close the stream and here we don't have any.
+         -> So in the below given code we have used try-with-resource because Files.line() returns a stream which will be
+         opened, to avoid manual consumption we are using here try-with-resource.
+         */
 
-        // Printing full path of current directory. It's same as "ls" command in the macOS/Linux terminal.
-        // This method returns a stream of path instances, each path representing either a file or a directory/folder or
-        // sub-folder and that going to be an element of stream called "Paths" which has a type "Path".
-        //  Stream<Path> paths = Files.list(path); If we use this under the normal try block it would through a warning
-        // as "'Stream<Path>' used without 'try'-with-resources statement" that is because the "Files.list(path)" returns
-        // an stream, so it required a terminal operation which would close the stream and here we don't have any.
-        // So in the below given code we have used try-with-resource because Files.line() returns a stream which will be
-        // opened, to avoid manual consumption we are using here try-with-resource.
         System.out.println("-Example of Files.list()--------------------------------------");
         try(Stream<Path> paths = Files.list(path)) {
             // This will print the folders and files in the current directories. However, this is not recursive so we
@@ -44,8 +46,9 @@ public class FileListingMain {
         System.out.println("-Example of Files.walk()--------------------------------------");
         /*
          Another method in the "Files" class, similar to the "list()" is "walk()" method.
-         If we select the maxDepth 2, then it will display the current directory content and sub-folder content, just
-         one level down.
+         In the walk method we can actually decide till how many level deep we will search certain name.
+         If we select the maxDepth 2, then it will display the current directory content and 1level deep sub-folder
+         content.
          */
         try(Stream<Path> paths = Files.walk(path, 2)) {
             paths.filter(Files::isRegularFile) // filters only files.
@@ -57,7 +60,17 @@ public class FileListingMain {
 
         System.out.println("Example of Files.find()--------------------------------------");
         /*
-         We also have find method in the "Files" class to find the folder/files.
+         -> We also have find method in the "Files" class to find the folder/files. It does take three argument,
+            First argument:  Path, second argument: maxDepth, third argument: BiPredicate.
+         -> Return a Stream that is lazily populated with Path by searching for files in a file tree rooted at a
+            given starting file.
+         -> This method walks the file tree in exactly the manner specified by the walk method.
+            For each file encountered, the given BiPredicate is invoked with its Path and BasicFileAttributes.
+            The Path object is obtained as if by resolving the relative path against start and is only included in
+            the returned Stream if the BiPredicate returns true. Compare to calling filter on the Stream returned by
+            walk method, this method may be more efficient by avoiding redundant retrieval of the BasicFileAttributes.
+         -> The returned stream contains references to one or more open directories. The directories are closed
+            by closing the stream.
          */
         try(Stream<Path> paths = Files.find(path, 2,
                 (item, attr) -> Files.isRegularFile(item))) {
@@ -67,7 +80,7 @@ public class FileListingMain {
             throw new RuntimeException(e);
         }
 
-        System.out.println("---------------------------------------");
+        System.out.println("In find BiFn used attr---------------------------------------");
         try(Stream<Path> paths = Files.find(path, 2,
                 (item, attr) -> attr.isRegularFile())) {
             paths.map(FileListingMain::listDir)
@@ -94,12 +107,30 @@ public class FileListingMain {
         }catch (IOException e){
             throw new RuntimeException(e);
         }
-
-
+        //--------------------------------------------------------------------------------------------------------------
          /*
          Directory stream is another Java NIO 2 class. It provides an iterable directories.
          => path.resolve() method takes a sub-folder from where it starts the navigation. In the below code we are
             starting from the ".idea" folder and looking for ".xml" files available in it using glob param.
+         -> Opens a directory, returning a DirectoryStream to iterate over the entries in the directory.
+            The elements returned by the directory stream's iterator are of type Path, each one representing an entry
+            in the directory.
+         -> The Path objects are obtained as if by resolving the name of the directory entry against dir.
+         -> The entries returned by the iterator are filtered by matching the String representation of their file names
+            against the given globbing pattern.
+            For example, suppose we want to iterate over the files ending with ".java" in a directory:
+                  Path dir = ...
+                  try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.java")) {
+                      :
+                   }
+
+         -> The globbing pattern is specified by the getPathMatcher method.
+         -> When not using the try-with-resources construct, then directory stream's close method should be invoked
+            after iteration is completed so, as to free any resources held for the open directory.
+            Params:
+                dir – the path to the directory
+                glob – the glob pattern.
+            Returns: a new and open DirectoryStream object.
          */
         path = path.resolve(".idea");
         System.out.println("========Directory Stream using glob=================================");
