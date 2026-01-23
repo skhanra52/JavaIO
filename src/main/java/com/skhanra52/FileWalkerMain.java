@@ -15,39 +15,78 @@ package com.skhanra52;
      -> "Breath First": This is the alternative to "Depth First". In this any child node of the particular folder
         are walked after the sibling(same level folders/file) folders/file visited.
 
-    Why this is important?----------------------------------
+Why this is important?----VVI------------------------------
      Because it is "Depth First", the "Files.walkFileTree()" method provides a mechanism to accumulate information
      about all the children, up to the parent.
-     -> Java provides entry points in the walk to execute operations through a "FileVisitor" interface.
-     -> This stubs out method we can implement at certain event in the walk.
-        These events are:
-        -> Before visiting the directory.
-        -> After visiting the directory.
-        -> When visiting the file.
-        -> A failure to visit the file.
-     ---------------------------------------------------------------------------------------------
-     FileVisitor Interface and the SimpleFileVisitor class signature given below:
-     <<interface>>
-     FileVisitor<T>
-       postVisitDirectory(T dir, IOException exc)
-       preVisitDirectory(T dir, BasicFileAttributes attrs)
-       visitFile(T file, BasicFileAttributes attrs)
-       visitFileFailed(T file, IOException exc)
+     -> Java provides "entry points"(Entry point = a method Java calls automatically, like callback function)
+        in the walk to execute operations through a "FileVisitor" interface.
+     -> This stubs out(default implementations) method we can implement at certain "event" in the walk.
+     NOTE:
+        (Meaning of above two lines, when Java walk through a directory tree (folders + files),
+        it gives us hooks(entry points) where our code can run. We don't control how Java walks the files.
+        Instead, java says:
+        "Hey, whenever something interesting happens during the walk, I will call your method."
+        Those "interesting moments" called events.)
 
+        These events are:                       | (corresponding method of FileVisitor Interfaces )
+        -> Before visiting the directory.       | preVisitDirectory(T dir, BasicFileAttributes attrs)
+        -> When visiting the file.              | visitFile(T file, BasicFileAttributes attrs)
+        -> A failure to visit the file.         | visitFileFailed(T file, IOException exc)
+        -> After visiting the directory.        | postVisitDirectory(T dir, IOException exc)
+
+        Java gives us empty stubs (default implementations) of above methods. We can override only what you care about.
+
+ What is FileVisitor? --------------------
+    FileVisitor Interface and the SimpleFileVisitor class signature given below:
+    <<interface>>
+    FileVisitor<T>
+        preVisitDirectory(T dir, BasicFileAttributes attrs)
+        visitFile(T file, BasicFileAttributes attrs)
+        visitFileFailed(T file, IOException exc)
+        postVisitDirectory(T dir, IOException exc)
+
+    Decode each event: ----------------------
+        1. preVisitDirectory(T dir, BasicFileAttributes attrs)
+           Meaning, we are about to go inside the folder. Before getting in do we want to do something first?
+           Use cases:
+             -> Print directory name.
+             -> Skip directory.
+             -> Check permissions.
+        2. visitFile(T file, BasicFileAttributes attrs)
+           Meaning, we found a file, what should we do with it?
+           Use cases:
+             -> Read/Write/Update/Delete file.
+             -> Count files.
+             -> Search contents.
+        3. visitFileFailed(T file, IOException exc)
+           Meaning, we tried to access this file, however, something went wrong.
+           Reasons:
+             -> No Permission.
+             -> File deleted mid-walk.
+             -> Locked file.
+        4. postVisitDirectory(T dir, IOException exc)
+           Meaning, we are done with the directory, and all its files.
+           Use Cases:
+             -> Cleanup, logging.
+             -> Summary after processing folder.
+
+
+    ------------------------------------------------------------------------------------
     Similarly, we have SimpleFileVisitor class.
     class SimpleFileVisitor
-      postVisitDirectory(T dir, IOException exc)
-      preVisitDirectory(T dir, BasicFileAttributes attrs)
-      visitFile(T file, BasicFileAttributes attrs)
-      visitFileFailed(T file, IOException exc)
-
+        postVisitDirectory(T dir, IOException exc)
+        preVisitDirectory(T dir, BasicFileAttributes attrs)
+        visitFile(T file, BasicFileAttributes attrs)
+        visitFileFailed(T file, IOException exc)
+    ------------------------------------------------------------------------------------
     Return type for both:
     <<Enumeration>>
     FileVisitResult
-      CONTINUE
-      SKIP_SIBLINGS
-      SKIP_SUBTREE
-      TERMINATE
+        CONTINUE
+        SKIP_SIBLINGS
+        SKIP_SUBTREE
+        TERMINATE
+
  */
 
 import java.io.IOException;
@@ -101,6 +140,11 @@ public class FileWalkerMain {
             level--;
             return FileVisitResult.CONTINUE;
         }
+
+        /*
+         Let say we want to get the total number of bytes of a folder, or the sum of its file sizes, and we want each
+         parent's sizes.
+         */
     }
 
 }
