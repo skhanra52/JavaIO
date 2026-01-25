@@ -102,7 +102,7 @@ public class FileWalkerMain {
 
         Path startingPath = Path.of(".");
 
-        FileVisitor<Path> statsVisitor = new StatsVisitor();
+        FileVisitor<Path> statsVisitor = new StatsVisitor(2);
         try {
             Files.walkFileTree(startingPath,statsVisitor);
         } catch (IOException e) {
@@ -112,12 +112,21 @@ public class FileWalkerMain {
 
     }
 
+/*
+ Let say we want to get the total number of bytes of a folder, or the sum of its file sizes, and we want each
+ parent's sizes.
+ */
     private static class StatsVisitor extends SimpleFileVisitor<Path> {
 
         private Path initialPath = null;
         // values of map represent the cumulative size of the folder.
         private final Map<Path, Long> folderSizes = new LinkedHashMap<>(); // LinkedHashMap to maintain insertion order
         private int initialCount;
+        private final int printLevel;
+
+        public StatsVisitor(int printLevel) {
+            this.printLevel = printLevel;
+        }
 
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -155,7 +164,9 @@ public class FileWalkerMain {
             if(relativeLevel == 1){
                 folderSizes.forEach((key, value) -> {
                     int level = key.getNameCount() - initialCount  -1;
-                    System.out.printf("%s[%s] - %d byte %n", "\t".repeat(level), key.getFileName(), value);
+                    if(level < printLevel){
+                        System.out.printf("%s[%s] - %d byte %n", "\t".repeat(level), key.getFileName(), value);
+                    }
                 });
             }else {
                 long folderSize = folderSizes.get(dir);
@@ -163,11 +174,5 @@ public class FileWalkerMain {
             }
             return FileVisitResult.CONTINUE;
         }
-
-        /*
-         Let say we want to get the total number of bytes of a folder, or the sum of its file sizes, and we want each
-         parent's sizes.
-         */
     }
-
 }
