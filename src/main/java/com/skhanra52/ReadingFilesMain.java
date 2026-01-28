@@ -13,6 +13,7 @@ package com.skhanra52;
 
  */
 
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -50,7 +51,64 @@ public class ReadingFilesMain {
             Meaning, it depends on OS and other factor.
 
           How the FileReader actually works:---------------------
-          
+          Before that we should know what is InputStream?
+          InputStream: (Video 307, 5.50min)
+            An Input Stream is  an abstract class, representing an input stream of byte.
+            -> It represents the source of data and a common interface to read that data.
+            -> InputStream can return a byte stream or a character stream.
+            -> once InputStream System.in.
+            -> For file InputStream is FileInputStream. This class is used for files containing binary data.
+            -> Using a read() method on the FileInputStream is very inefficient because each reading would be Disk Read.
+               So, if we are going to use a FileInputStream, we would want to wrap it in a BufferedInputStream.
+
+            Below is the class signature  of InputStream from ay source:
+            Abstract: InputStream
+                abstract read()
+                read(byte[] b): int
+                read(byte[] b, int offset, int length)
+                readAllBytes(): byte[]
+                readNByte(byte[] b, int offset, int length): int
+                readNByte(length): byte[]
+
+            BufferedInputStream
+                BufferedInputStream(InputStream inputStream)
+                BufferedInputStream(InputStream inputStream, int size)
+
+            FileInputStream     (Input stream from a file (not buffered)).
+
+          **------- An InputStream is not a source for a stream pipeline. ----*****
+          InputStream is not a kind of normal Stream which we create to use stream operation.
+          It's a similar concept, in that we get a stream of data, in some kind of sequential away.
+          However, an InputStream can't be used in a stream pipeline without first transforming it.
+
+          *** Readers----------------***
+          Reader read characters,
+          -> An InputStreamReader is a bridge, from byte streams to character streams.
+
+          Abstract: Reader
+            read(): int
+            read(char[] charBuffer): int
+            abstract read(char[] charBuffer, int offset, int length)
+            int read(CharBuffer target)
+
+         Class InputStreamReader {
+            inputStreamReader(InputStream inputStream, ...)
+         }
+
+         FileReader
+            FileReader(File file,...)
+            FileReader(String fileName,...) (For reading text based file)
+
+
+         BufferedReader :(It also do buffer reading with larger buffer size than FileReader)
+            BufferedReader(Reader input)
+            BufferedReader(Reader input, int size)
+
+            lines: Stream<String> -------
+                                         |------- Provide ability to modify buffer size and read lines.
+            readLine(): String    -------
+
+
          */
 
         try(FileReader reader = new FileReader("files/fileReading.txt")){
@@ -64,6 +122,19 @@ public class ReadingFilesMain {
             }
 
         }catch(IOException e){
+            e.printStackTrace();
+        }
+
+        System.out.println("----------------------------------------------------------");
+        try(BufferedReader bufferedReader = new BufferedReader(new FileReader("files/fileReading.txt"))){
+            // String line;
+            // while ((line = bufferedReader.readLine()) != null){
+            //     System.out.println(line);
+            // }
+            // Replace the above commented code with single statement using bufferReader.lines().
+            bufferedReader.lines().forEach(System.out::println);
+
+        }catch (IOException e){
             e.printStackTrace();
         }
     }
