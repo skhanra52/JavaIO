@@ -45,23 +45,23 @@ public class ReadingFilesMain {
          -> A file buffer is a computer memory which temporarily holds data while it's being read from the file.
          -> Its primary purpose is to improve the efficiency of the data transfer and processing.
          -> It reduces the number of direct interactions, or disk read, against the actual storage device.
-         -> In our example, where we are reading from the "files/fileReading.txt", which has 11 characters. Only one
+         -> In our example above, where we are reading from the "files/fileReading.txt", which has 11 characters. Only one
             of them(the first) was an actual disk read. The subsequent characters are read from the memory, or a buffer
             read. Java's API says that the size of the buffer in the case of FileReader is implementation specific.
             Meaning, it depends on OS and other factor.
 
-          How the FileReader actually works:---------------------
+          How the FileReader actually works?---------------------
           Before that we should know what is InputStream?
           InputStream: (Video 307, 5.50min)
             An Input Stream is  an abstract class, representing an input stream of byte.
             -> It represents the source of data and a common interface to read that data.
             -> InputStream can return a byte stream or a character stream.
-            -> once InputStream System.in.
-            -> For file InputStream is FileInputStream. This class is used for files containing binary data.
+            -> One of the InputStream is "System.in".
+            -> For file InputStream is "FileInputStream". This class is used for files containing binary data.
             -> Using a read() method on the FileInputStream is very inefficient because each reading would be Disk Read.
-               So, if we are going to use a FileInputStream, we would want to wrap it in a BufferedInputStream.
+               So, if we are going to use a FileInputStream, we would want to wrap it in a "BufferedInputStream".
 
-            Below is the class signature  of InputStream from ay source:
+            Below is the class signature  of InputStream from any source:
             Abstract: InputStream
                 abstract read()
                 read(byte[] b): int
