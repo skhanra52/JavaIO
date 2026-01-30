@@ -43,8 +43,11 @@ NIO: It was introduced as Non-blocking IO, with the java.nio package in java 1.4
     called buffers information when exchanged.
 NIO.2: Stands for New IO, and is a term that came into being with java 1.7, emphasizing significant improvements to the
     java.nio package, most importantly the java.nio.file package and its type.
-    The NIO.2 introduced Path interface and file system types, and some helper classes such as Files, Paths, and
-    FileSystem that do make some common functionality for working with operating system file systems much easier as well
+    The NIO.2 introduced Path interface and file system types, and some helper classes such as
+        -> Files,
+        -> Paths,
+        -> FileSystem
+    these do make some common functionality for working with operating system file systems much easier as well
     as much efficient, delegating work to native system.
 
 
@@ -120,7 +123,6 @@ public class Main {
            A File Resource, on the other hand, is the actual data from the file.
            It is stored on desk, and it can be accessed by the operating system and by application.
 
-
          */
 
         File file = getFile();
@@ -132,15 +134,15 @@ public class Main {
         System.out.println("We are good to go");
 
         /*
-            File System concept:
-            --------------------------------------------
-            -> A "directory(or Folder)" is a file system container for other directories ot files.
-            -> A "path" is either a directory or a filename and may include information about parent directories or folder.
-            -> A "root directory" is the top level directory in the file system.
-            -> The "current working directory" is the directory where the current process is working in or running from.
-            -> An "Absolute path" includes the root(by either starting with / or optionally, C:\ in windows)
-            -> A "relative path" defines a path relative to the current working directory, and therefore would not start
-               with /, but may optionally start with dot . then a file separator character.
+         File System concept:
+         --------------------------------------------
+         -> A "directory(or Folder)" is a file system container for other directories ot files.
+         -> A "path" is either a directory or a filename and may include information about parent directories or folder.
+         -> A "root directory" is the top level directory in the file system.
+         -> The "current working directory" is the directory where the current process is working in or running from.
+         -> An "Absolute path" includes the root(by either starting with / or optionally, C:\ in windows)
+         -> A "relative path" defines a path relative to the current working directory, and therefore would not start
+            with /, but may optionally start with dot . then a file separator character.
          */
 
         // using nio2 ------------------------
@@ -156,8 +158,9 @@ public class Main {
         useFile("files/testing2.csv"); // It read the existing file from the directory. It is taking file name as param.
         usePath("pathFile.txt"); // It has created the pathFile.txt in the first run. It actually takes path as param.
         /*
-          In the above, useFile() method takes the "file name" as an argument and uses the old File class after instantiate
-          the File object. This is the older version of checking whether the file exist or not, creating files etc.
+          In the above, useFile() method takes the "file name" as an argument and uses the old File class after
+          instantiate the File object. This is the older version of checking whether the file exist or not, creating
+          files etc.
           In the other hand, we also have path, usePath() method takes the path as an argument and directly uses the
           File static methods which are all takes path as an argument and perform all the common functions.
 
