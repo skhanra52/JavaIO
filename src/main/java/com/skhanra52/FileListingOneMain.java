@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.stream.Stream;
 
-public class FileListingMain {
+public class FileListingOneMain {
 
     public static void main(String[] args) {
         // Created variable called "path" using empty string, which gives current working directory.
@@ -37,7 +37,7 @@ public class FileListingMain {
             // paths.forEach(System.out::println);
 
             // Below code list the sub-folders/files available in the current directory
-            paths.map(FileListingMain::listDir)
+            paths.map(FileListingOneMain::listDir)
                     .forEach(System.out::println);
         }catch (IOException e){
             throw new RuntimeException(e);
@@ -52,7 +52,7 @@ public class FileListingMain {
          */
         try(Stream<Path> paths = Files.walk(path, 2)) {
             paths.filter(Files::isRegularFile) // filters only files.
-                    .map(FileListingMain::listDir)
+                    .map(FileListingOneMain::listDir)
                     .forEach(System.out::println);
         }catch (IOException e){
             throw new RuntimeException(e);
@@ -74,7 +74,7 @@ public class FileListingMain {
          */
         try(Stream<Path> paths = Files.find(path, 2,
                 (item, attr) -> Files.isRegularFile(item))) {
-            paths.map(FileListingMain::listDir)
+            paths.map(FileListingOneMain::listDir)
                     .forEach(System.out::println);
         }catch (IOException e){
             throw new RuntimeException(e);
@@ -83,7 +83,7 @@ public class FileListingMain {
         System.out.println("In find BiFn used attr---------------------------------------");
         try(Stream<Path> paths = Files.find(path, 2,
                 (item, attr) -> attr.isRegularFile())) {
-            paths.map(FileListingMain::listDir)
+            paths.map(FileListingOneMain::listDir)
                     .forEach(System.out::println);
         }catch (IOException e){
             throw new RuntimeException(e);
@@ -92,7 +92,7 @@ public class FileListingMain {
         System.out.println("Search files in all level and size more than 300kb---------------------------------------");
         try(Stream<Path> paths = Files.find(path, Integer.MAX_VALUE,
                 (item, attr) -> attr.isRegularFile() && attr.size() > 300)) {
-            paths.map(FileListingMain::listDir)
+            paths.map(FileListingOneMain::listDir)
                     .forEach(System.out::println);
         }catch (IOException e){
             throw new RuntimeException(e);
@@ -102,7 +102,7 @@ public class FileListingMain {
         try(Stream<Path> paths = Files.find(path, 2,
                 (item, attr) -> item.endsWith("testing2.csv"))) {
             paths
-                    .map(FileListingMain::listDir)
+                    .map(FileListingOneMain::listDir)
                     .forEach(System.out::println);
         }catch (IOException e){
             throw new RuntimeException(e);
@@ -135,7 +135,7 @@ public class FileListingMain {
         path = path.resolve(".idea");
         System.out.println("========Directory Stream using glob=================================");
         try(DirectoryStream<Path> dirs = Files.newDirectoryStream(path, "*.xml")){
-            dirs.forEach((d) -> System.out.println(FileListingMain.listDir(d)));
+            dirs.forEach((d) -> System.out.println(FileListingOneMain.listDir(d)));
         }catch (IOException e){
             throw new RuntimeException(e);
         }
@@ -144,7 +144,7 @@ public class FileListingMain {
                 p -> p.getFileName().toString().endsWith(".xml")
                         && Files.isRegularFile(p)
                         && Files.size(p) > 1000)){
-            dirs.forEach((d) -> System.out.println(FileListingMain.listDir(d)));
+            dirs.forEach((d) -> System.out.println(FileListingOneMain.listDir(d)));
         }catch (IOException e){
             throw new RuntimeException(e);
         }

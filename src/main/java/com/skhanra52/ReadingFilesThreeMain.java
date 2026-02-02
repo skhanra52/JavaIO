@@ -17,11 +17,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class ReadingFilesMain {
+public class ReadingFilesThreeMain {
 
     public static void main(String[] args) {
         /*
-         The below code where we are using reader.read() method till we get "-1" which is the end of the file.
+         reader.read() -> This method returns integer, till we get "-1" which is the end of the file.
          This is a tedious way to read file, as well as its very expensive when it comes to Disk Read.
          Disk Read:-----------------------------------
            A Disk read means something is physically or mechanically occurring to the hard disk to read the character
@@ -125,7 +125,7 @@ public class ReadingFilesMain {
             e.printStackTrace();
         }
 
-        System.out.println("----------------------------------------------------------");
+        System.out.println("Buffer Reader--------------------------------------------------");
         try(BufferedReader bufferedReader = new BufferedReader(new FileReader("files/fileReading.txt"))){
             // String line;
             // while ((line = bufferedReader.readLine()) != null){

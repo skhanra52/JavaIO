@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ReadingWithNIO2Main {
+public class ReadingWithNIO2FourMain {
 
     public static void main(String[] args) {
         /*

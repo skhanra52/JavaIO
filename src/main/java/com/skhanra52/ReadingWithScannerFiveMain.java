@@ -8,7 +8,7 @@ import java.util.regex.MatchResult;
 
 // Continuation from ReadingFilesMain...
 
-public class ScannerProjectMain {
+public class ReadingWithScannerFiveMain {
 
     public static void main(String[] args) {
 
@@ -119,6 +119,5 @@ public class ScannerProjectMain {
         } catch (IOException e) {
             throw new RuntimeException();
         }
-
     }
 }
