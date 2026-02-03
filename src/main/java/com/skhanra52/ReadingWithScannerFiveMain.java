@@ -26,23 +26,34 @@ public class ReadingWithScannerFiveMain {
                 this((ReadableByteChannel)(new FileInputStream(source).getChannel()));
              }
          */
-        try (Scanner scanner = new Scanner(new File("files/fileReading.txt"))) {
-//            while(scanner.hasNextLine()){
-//                System.out.println(scanner.nextLine());
-//            }
-            /*
-             Using while loop is not that easy as BufferReader.lines()
-             using Token method to get a stream of String. Output of below code using tokens() is exactly same as
-             above while loop. Each line of text in the file is return on the stream as we used delimiter "$" which is
-             meta character for end of line. And we can work on lines of text rather that words if we will be using
-             default delimiter as "\p{javaWhitespace}+" which means one or more whitespace and includes new line.
-             */
-//            System.out.println(scanner.delimiter());
-//            scanner.useDelimiter("$");
-//            scanner.tokens().forEach(System.out::println);
 
-            // List of words that are 10 character or more. It enables the capability of quick search for
-            // matching elements.
+        try (Scanner scanner = new Scanner(new File("files/fileReading.txt"))) {
+            while(scanner.hasNextLine()){
+                System.out.println(scanner.nextLine());
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException();
+        }
+
+        /*
+         Using while loop is not that easy as BufferReader.lines(), using Token method to get a stream of String.
+         Output of below code using tokens() is exactly same as above while loop.
+         Each line of text in the file is return on the stream as we used delimiter "$" which is meta character for end
+         of line, and we can work on lines of text rather that words if we will be using default delimiter as
+         "\p{javaWhitespace}+" which means one or more whitespace and includes new line.
+         */
+        try (Scanner scanner = new Scanner(new File("files/fileReading.txt"))) {
+            System.out.println(scanner.delimiter());
+            scanner.useDelimiter("$");
+            scanner.tokens().forEach(System.out::println);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException();
+        }
+
+        /*
+         List of words that are 10 character or more. It enables the capability of quick search for matching elements.
+         */
+        try (Scanner scanner = new Scanner(new File("files/fileReading.txt"))) {
             scanner.findAll("[A-Aa-z]{10,}")
                     .map(MatchResult::group)
                     .distinct()

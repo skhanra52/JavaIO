@@ -9,8 +9,6 @@ package com.skhanra52;
  However, We are going to see how reading file operation was happening in the previous versions like Java 1.0.
  These methods somewhat reflect the actual process of reading data from a file, as opposed to a black box method
  like readAllLines.
-
-
  */
 
 import java.io.BufferedReader;
@@ -99,16 +97,13 @@ public class ReadingFilesThreeMain {
             FileReader(File file,...)
             FileReader(String fileName,...) (For reading text based file)
 
-
-         BufferedReader :(It also do buffer reading with larger buffer size than FileReader)
+         BufferedReader : (It also do buffer reading with larger buffer size than FileReader)
             BufferedReader(Reader input)
             BufferedReader(Reader input, int size)
 
             lines: Stream<String> -------
                                          |------- Provide ability to modify buffer size and read lines.
             readLine(): String    -------
-
-
          */
 
         try(FileReader reader = new FileReader("files/fileReading.txt")){
@@ -126,12 +121,18 @@ public class ReadingFilesThreeMain {
         }
 
         System.out.println("Buffer Reader--------------------------------------------------");
+
         try(BufferedReader bufferedReader = new BufferedReader(new FileReader("files/fileReading.txt"))){
-            // String line;
-            // while ((line = bufferedReader.readLine()) != null){
-            //     System.out.println(line);
-            // }
-            // Replace the above commented code with single statement using bufferReader.lines().
+             String line;
+             while ((line = bufferedReader.readLine()) != null){
+                 System.out.println(line);
+             }
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        // Replace the above bufferReader.readLine() code with single statement using bufferReader.lines().
+        try(BufferedReader bufferedReader = new BufferedReader(new FileReader("files/fileReading.txt"))){
             bufferedReader.lines().forEach(System.out::println);
 
         }catch (IOException e){
