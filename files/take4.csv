@@ -1,5 +1,4 @@
 Student Id, Country Code, Enrolled Year, Age, Gender, Experienced, Course code,Engagement Month, Engagement Year, Engagement Type
-
 1,GB,10,2018,41,M,false,JMC,JANUARY,2023,Lecture 12
 1,GB,10,2018,41,M,false,PYMC,AUGUST,2018,Lecture 3
 2,IN,1,2024,27,F,true,JMC,MAY,2026,Lecture 13

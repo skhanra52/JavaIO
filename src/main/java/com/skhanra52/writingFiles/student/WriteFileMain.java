@@ -24,6 +24,8 @@ package com.skhanra52.writingFiles.student;
  */
 
 import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -80,7 +82,8 @@ public class WriteFileMain {
 //            e.printStackTrace();
 //        }
 
-        // It would be efficient to create a single iterable object and pass that for writing.
+        // It would be efficient to create a single iterable object and pass that for writing. This is called
+        // single Files.write() method.
 
         try{
             List<String> data = new ArrayList<>();
@@ -95,7 +98,7 @@ public class WriteFileMain {
 
         /*
          In the above we are using Files.write() to write to file. However, everytime you write it will overwrite the
-         previous content. The same can be achieved by below code.
+         previous content. The same can be achieved using "BufferWriter" as well, refer below code.
          */
 
         try(BufferedWriter writer = Files.newBufferedWriter(Path.of("files/take2.csv"))){
@@ -105,6 +108,32 @@ public class WriteFileMain {
                 for (var record : student.getEngagementRecords()){
                     writer.write(record);
                     writer.newLine();
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+        try(FileWriter writer = new FileWriter("files/take3.csv")){
+            writer.write(header);
+            writer.write(System.lineSeparator());
+            for (Student student : students){
+                for (var record : student.getEngagementRecords()){
+                    writer.write(record);
+                    writer.write(System.lineSeparator());
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        try(PrintWriter writer = new PrintWriter("files/take4.csv")){
+            writer.write(header);
+            for (Student student : students){
+                for (var record : student.getEngagementRecords()){
+//                    writer.write(record);
+                    writer.println(record);
                 }
             }
         } catch (Exception e) {
