@@ -139,5 +139,23 @@ public class WriteFileMain {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        /*
+         Difference between various writer classes:
+         ---------------------------------------------------------------------------------------------------------------
+                        |     Buffering           | Data Format |         Features          | Use cases
+         ---------------------------------------------------------------------------------------------------------------
+         BufferedWriter | Yes                     | Characters  | Supports line breaks with | Writing large amount of
+                        |                         |             | newline methods.          | text to a file.
+         ---------------------------------------------------------------------------------------------------------------
+         FileWriter     | Yes, but much smaller   | Characters  | No Separate method for lin| Writing small amount of
+                        | buffer than BufferWriter|             |-e separator, would need to| text to a file
+                        |                         |             | write manually.           |
+         ---------------------------------------------------------------------------------------------------------------
+         PrintWriter    | No, But often used with | Characters, | Familiar methods, that hav| Writing text to a file,
+                        | with a bufferWriter     | Numbers,    |-e same behaviour as       | formatting output, and
+                        |                         | Objects     | System.out methods        | outputting objects.
+         ---------------------------------------------------------------------------------------------------------------
+         */
     }
 }

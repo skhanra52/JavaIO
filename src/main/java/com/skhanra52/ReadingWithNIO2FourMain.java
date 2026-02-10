@@ -36,6 +36,7 @@ public class ReadingWithNIO2FourMain {
             System.out.println(Files.readString(path));
 
             /*
+             Files.readAllLines():
              We will parse the fixedWidth.txt to get distinct values out of certain column, using readAllLines(), this
              method returns an array of String, So we will see a solution without using Stream.
              */
@@ -51,8 +52,10 @@ public class ReadingWithNIO2FourMain {
             });
             System.out.println(values);
 
-            // Another way of doing the same which we have done above, here we are using Files.lines() which returns
-            // a Stream of String.
+            /* Files.lines():
+             Another way of doing the same which we have done above, here we are using Files.lines() which returns
+             a Stream of String.
+             */
             try(Stream<String> stringStream = Files.lines(path)){
                 String[] result = stringStream.skip(1)
                         .map(p::matcher)
