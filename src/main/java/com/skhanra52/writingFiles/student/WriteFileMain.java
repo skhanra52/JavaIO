@@ -157,5 +157,33 @@ public class WriteFileMain {
                         |                         | Objects     | System.out methods        | outputting objects.
          ---------------------------------------------------------------------------------------------------------------
          */
+
+        try(PrintWriter writer = new PrintWriter("files/take4.txt")){
+            writer.write(header);
+            for (Student student : students){
+                for (var record : student.getEngagementRecords()){
+                    String[] recordData = record.split(",");
+                    writer.printf("%-12d%-14s%2d%12d%3d%-1s".formatted(
+                            student.getStudentId(),  // Student Id
+                            student.getCountry(),           // Country Code
+                            student.getEnrollmentYear(),    // Enrolled year
+                            student.getEnrollmentMonth(),   // Enrolled month
+                            student.getEnrollmentAge(),     // Enrolled age
+                            student.getGender()
+                    ));
+                    writer.printf("%-1s", (student.hasExperience() ? 'Y' : 'N'));
+                    writer.format("%-3s%10.2f%-10s%-4s%-30s",   // alternate to printf
+                            recordData[7],                    // Course code
+                            student.getPercentComplete(recordData[7]),
+                            recordData[8],                    // Engagement Month
+                            recordData[9],                    // Engagement Year
+                            recordData[10]                   // Engagement Type
+                            );
+                    writer.println();
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
