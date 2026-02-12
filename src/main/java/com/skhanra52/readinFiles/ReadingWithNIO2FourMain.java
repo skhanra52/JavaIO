@@ -1,4 +1,4 @@
-package com.skhanra52;
+package com.skhanra52.readinFiles;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

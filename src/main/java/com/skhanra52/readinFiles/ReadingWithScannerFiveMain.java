@@ -1,4 +1,4 @@
-package com.skhanra52;
+package com.skhanra52.readinFiles;
 
 import java.io.*;
 import java.nio.file.Path;

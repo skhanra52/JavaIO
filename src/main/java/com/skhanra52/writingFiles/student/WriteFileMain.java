@@ -153,7 +153,7 @@ public class WriteFileMain {
                         |                         |             | write manually.           |
          ---------------------------------------------------------------------------------------------------------------
          PrintWriter    | No, But often used with | Characters, | Familiar methods, that hav| Writing text to a file,
-                        | with a bufferWriter     | Numbers,    |-e same behaviour as       | formatting output, and
+                        | a bufferWriter          | Numbers,    |-e same behaviour as       | formatting output, and
                         |                         | Objects     | System.out methods        | outputting objects.
          ---------------------------------------------------------------------------------------------------------------
          */
