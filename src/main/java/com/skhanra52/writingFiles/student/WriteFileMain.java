@@ -19,15 +19,23 @@ package com.skhanra52.writingFiles.student;
     Understanding buffer data become more important, as well as managing multiple writes to a single file from
     the different threads.
 
-    There are different ways to open a file for writes.
+    How many ways can we write to a file in Java?
+
+    In core java, we can write to a file using
+        -> character streams (FileWriter, BufferedWriter, PrintWriter)
+        -> byte stream (FileOutputStream, BufferedOutputStream)
+        -> NIO utilities(Files.write, Files.writeString)
+
 
  */
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -91,7 +99,7 @@ public class WriteFileMain {
             for(Student student: students){
                 data.addAll(student.getEngagementRecords());
             }
-            Files.write(path, data);
+            Files.write(path, data);  // available from NIO
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -183,6 +191,18 @@ public class WriteFileMain {
                 }
             }
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            System.out.println("Checking the Files.writeString method--------");
+            Files.writeString(path, header);
+            for (Student student : students){
+                for (var record : student.getEngagementRecords()) {
+                    Files.writeString(path, record, StandardOpenOption.APPEND);
+                }
+            }
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
