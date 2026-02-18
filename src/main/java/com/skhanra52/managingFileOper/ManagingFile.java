@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.stream.Stream;
 
 public class ManagingFile {
@@ -118,7 +119,6 @@ public class ManagingFile {
 //        }
 
         // Copying the file to another directory (Deep copy where the directory contents are copied)
-
         try{
             if(Files.exists(resourcesDir)){
                 deleteResource(resourcesDir);
@@ -128,6 +128,11 @@ public class ManagingFile {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        /*
+         Explore a method on both the Reader and the InputStream interfaces, called "transferTo".
+         This method was added in InputStream in JDK9, and the Reader interface in JDK10.
+         */
     }
 
 //    public static File getFile(){
@@ -183,5 +188,25 @@ public class ManagingFile {
             });
         }
         Files.deleteIfExists(target);
+    }
+
+    /**
+     * Correct Version (Professional Way)
+     * @param target
+     * @throws IOException
+     */
+    public static void recurseDeleteWalk(Path target) throws IOException{
+        try(Stream<Path> walk = Files.walk(target)){
+            walk.sorted(Comparator.reverseOrder()) // deleting child first
+                .forEach(p -> {
+                    try{
+                        Files.delete(p);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
