@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.stream.Stream;
 
 public class ManagingFile {
 
@@ -42,40 +44,144 @@ public class ManagingFile {
             --> Files class does not have method to rename file, so here "move()" has been used.
          */
 
-        Path oldPath = oldFile.toPath();
-        Path newPath = newFile.toPath();
-        try{
-            Files.move(oldPath, newPath);
-            System.out.println("Path renamed Successfully");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        Path oldPath = oldFile.toPath();
+//        Path newPath = newFile.toPath();
+//        try{
+//            Files.move(oldPath, newPath);
+//            System.out.println("Path renamed Successfully");
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
         /*
          Change the path we're moving to, adding a subfolder as part of the path.
          While creating "newPath1" we have to remember that the Files.move() does not create sub directory. So initially
          when we run the Files.move() with "newPath1" holds the Path.of("files/students-activity.json") it actually
          will throw a NoSuchFileException. So we have to make sure the directory/subdirectories are present before
          invoking move with subdirectory. It throws NoSucFileException exception.
-         For this we have to check and move the files which can be done using
+
+         For this we have to check and move the files which can be done using "getParent()" method.
          Files.createDirectories(newPath1.getParent());
 
+         getParent() -> preserves the root, meaning if path is absolute
+                        Path newPath1 = Path.of("/Users/suman/files/student-activity.json");
+                      it returns "/Users/suman/files/"
+         subPath()   -> newPath1.subPath(0, newPath1.getNameCount() - 1)
+                      it returns "Users/suman/files/", root "/" is lost which makes it as relative path.
+                      In this case pathNameCount() returns 4
+                      so newPath1.subPath(0,4-1);
+
+                      However, the biggest issue with subPath() is, if the Path has only one element,
+                      Path newPath1 = Path.of("student-activity.json");
+                      newPath1.subPath(0, newPath1.getNameCount() - 1); // newPath1.subPath(0, 1 - 1);
+                      newPath.subPath1(0,0); // it throws IllegalArgumentException;
          */
 
-        Path oldPath1 = Path.of("students.json");
-        Path newPath1 = Path.of("files/students-activity.json");
+//        Path oldPath1 = Path.of("students.json");
+//        Path newPath1 = Path.of("files/students-activity.json");
+//        try{
+//            Files.createDirectories(newPath1.getParent()); // creates  the directory if not exist.
+//            Files.move(oldPath1,newPath1);
+//            System.out.println("Path renamed Successfully");
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        // Using subPath
+//        try{
+//            Files.createDirectories(newPath1.subPath(0,newPath1.getNameCount() - 1)); // creates  the directory if not exist.
+//            Files.move(oldPath1,newPath1);
+//            System.out.println("Path renamed Successfully");
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        /*
+         Using Files.move() rename directories.
+         */
+
+        Path fileDir = Path.of("files");
+        Path resourcesDir = Path.of("resources");
+//        try{
+//            Files.move(fileDir,resourcesDir, StandardCopyOption.REPLACE_EXISTING); // replacing existing if exist
+//            System.out.println("Directory has been renamed");
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        // Copying the file to another directory (Shallow copy where the directory contents are not copied)
+
+//        try{
+//            Files.copy(fileDir,resourcesDir); // creating shallow copy of the fileDir.
+//            System.out.println("Directory has been copied");
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        // Copying the file to another directory (Deep copy where the directory contents are copied)
+
         try{
-            Files.createDirectories(newPath1.getParent()); // creates  the directory if not exist.
-            Files.move(oldPath1,newPath1);
-            System.out.println("Path renamed Successfully");
+            if(Files.exists(resourcesDir)){
+                deleteResource(resourcesDir);
+            }
+//            resourceCopy(fileDir,resourcesDir); // creating shallow copy of the fileDir.
+            System.out.println("Directory has been copied");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static File getFile(){
-        System.out.println("cwd: "+ new File("").getAbsolutePath());
-        String cwd = new File("").getAbsolutePath();
+//    public static File getFile(){
+//        System.out.println("cwd: "+ new File("").getAbsolutePath());
+//        String cwd = new File("").getAbsolutePath();
+//
+//        return new File("students.json");
+//    }
 
-        return new File("students.json");
+    public static void resourceCopy(Path source, Path target) throws IOException{
+        Files.copy(source,target, StandardCopyOption.REPLACE_EXISTING); // to avoid DirectoryNotEmptyException
+        if(Files.isDirectory(source)){
+           try(Stream<Path> children =  Files.list(source)){
+               children.toList().forEach(sourcePath -> {
+                   try {
+                       // target.resolve(sourcePath.getFileName()) concatenating file name from source to target
+                       resourceCopy(sourcePath, target.resolve(sourcePath.getFileName()));
+                   } catch (IOException e) {
+                       throw new RuntimeException(e);
+                   }
+               });
+           } catch (IOException e) {
+               throw new RuntimeException(e);
+           }
+        }
+    }
+
+    public static void deleteResource(Path target) throws IOException{
+        if(Files.isDirectory(target)){
+            try(Stream<Path> path = Files.list(target)){
+                path.toList().forEach(path1 -> {
+                    try {
+                        deleteResource(path1);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        }
+        Files.deleteIfExists(target);
+    }
+
+    public static void recurseDelete(Path target) throws IOException{
+        System.out.println(target.toAbsolutePath());
+        Path absolutePath = target.toAbsolutePath();
+        if(Files.isDirectory(target)){
+            Files.list(target).forEach(p -> {
+                try {
+                    recurseDelete(p);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        Files.deleteIfExists(target);
     }
 }
