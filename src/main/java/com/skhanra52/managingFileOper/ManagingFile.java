@@ -1,7 +1,7 @@
 package com.skhanra52.managingFileOper;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -109,8 +109,11 @@ public class ManagingFile {
 //            throw new RuntimeException(e);
 //        }
 
-        // Copying the file to another directory (Shallow copy where the directory contents are not copied)
+        /* ---------------------------------------------------------------------------------------------------------
+         Example of Copy and delete files from the file system.
+         */
 
+        // Copying the file to another directory (Shallow copy where the directory contents are not copied)
 //        try{
 //            Files.copy(fileDir,resourcesDir); // creating shallow copy of the fileDir.
 //            System.out.println("Directory has been copied");
@@ -119,20 +122,54 @@ public class ManagingFile {
 //        }
 
         // Copying the file to another directory (Deep copy where the directory contents are copied)
-        try{
-            if(Files.exists(resourcesDir)){
-                deleteResource(resourcesDir);
-            }
+//        try{
+//            deleteResource(resourcesDir);
 //            resourceCopy(fileDir,resourcesDir); // creating shallow copy of the fileDir.
-            System.out.println("Directory has been copied");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//            System.out.println("Directory has been copied to" + resourcesDir);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
         /*
          Explore a method on both the Reader and the InputStream interfaces, called "transferTo".
          This method was added in InputStream in JDK9, and the Reader interface in JDK10.
+         reader.transferTo() actually creating student-backup.json and copying the file's contents to it,
+         which we can do it using "Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING)". We can prefer
+         to use Files.copy() when we are working within the file system to take the advantage of file system provider.
+         -> We can use reader.transferTo() when we are dealing with very large file, especially if a file is being
+            copied across different network drives.
          */
+        // Setup BufferReader for the student-activity.json which is under sub folder of files.
+
+//        try(BufferedReader reader = new BufferedReader(new FileReader("files/Data/students-activity.json"));
+//            PrintWriter writer = new PrintWriter("student-backup.json")){
+//            // it's actually creating student-backup.json and copying the file's contents to it, which we can do it
+//            // using Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING)
+//            reader.transferTo(writer);
+//        }catch (IOException e){
+//            throw new RuntimeException(e);
+//        }
+
+        /*
+         Another example of transferTo() method.
+         We are using java.net package to make a request to website to get the json response
+         */
+
+        String urlString = "https://api.census.gov/data/2019/pep/charagegroup?get=NAME,POP&for=state:*";
+        URI uri = URI.create(urlString); // URL coming from the java.net
+        try(var urlInputStream = uri.toURL().openStream()){
+            urlInputStream.transferTo(System.out);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Path jsonPath = Path.of("files/data/USPopulationByState.txt");
+        try(InputStreamReader reader = new InputStreamReader(uri.toURL().openStream());
+        BufferedWriter writer = Files.newBufferedWriter(jsonPath)){
+            reader.transferTo(writer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 //    public static File getFile(){
@@ -179,13 +216,15 @@ public class ManagingFile {
         System.out.println(target.toAbsolutePath());
         Path absolutePath = target.toAbsolutePath();
         if(Files.isDirectory(target)){
-            Files.list(target).forEach(p -> {
-                try {
-                    recurseDelete(p);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+           try(Stream<Path> files = Files.list(target)) { // navigating path through Files.List()
+                    files.forEach(p -> {
+                   try {
+                       recurseDelete(p); // recursively calling recurseDelete()
+                   } catch (IOException e) {
+                       throw new RuntimeException(e);
+                   }
+               });
+           }
         }
         Files.deleteIfExists(target);
     }
@@ -196,7 +235,7 @@ public class ManagingFile {
      * @throws IOException
      */
     public static void recurseDeleteWalk(Path target) throws IOException{
-        try(Stream<Path> walk = Files.walk(target)){
+        try(Stream<Path> walk = Files.walk(target)){ // Navigating path through Files.walk()
             walk.sorted(Comparator.reverseOrder()) // deleting child first
                 .forEach(p -> {
                     try{
