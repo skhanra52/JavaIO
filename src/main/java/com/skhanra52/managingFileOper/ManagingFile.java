@@ -1,7 +1,6 @@
 package com.skhanra52.managingFileOper;
 
 import java.io.*;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -141,35 +140,35 @@ public class ManagingFile {
          */
         // Setup BufferReader for the student-activity.json which is under sub folder of files.
 
-//        try(BufferedReader reader = new BufferedReader(new FileReader("files/Data/students-activity.json"));
-//            PrintWriter writer = new PrintWriter("student-backup.json")){
-//            // it's actually creating student-backup.json and copying the file's contents to it, which we can do it
-//            // using Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING)
-//            reader.transferTo(writer);
-//        }catch (IOException e){
-//            throw new RuntimeException(e);
-//        }
+        try(BufferedReader reader = new BufferedReader(new FileReader("files/Data/students-activity.json"));
+            PrintWriter writer = new PrintWriter("student-backup.json")){
+            // it's actually creating student-backup.json and copying the file's contents to it, which we can do it
+            // using Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING)
+            reader.transferTo(writer);
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
 
         /*
          Another example of transferTo() method.
          We are using java.net package to make a request to website to get the json response
          */
 
-        String urlString = "https://api.census.gov/data/2019/pep/charagegroup?get=NAME,POP&for=state:*";
-        URI uri = URI.create(urlString); // URL coming from the java.net
-        try(var urlInputStream = uri.toURL().openStream()){
-            urlInputStream.transferTo(System.out);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        Path jsonPath = Path.of("files/data/USPopulationByState.txt");
-        try(InputStreamReader reader = new InputStreamReader(uri.toURL().openStream());
-        BufferedWriter writer = Files.newBufferedWriter(jsonPath)){
-            reader.transferTo(writer);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        String urlString = "https://api.census.gov/data/2019/pep/charagegroup?get=NAME,POP&for=state:*";
+//        URI uri = URI.create(urlString); // URL coming from the java.net
+//        try(var urlInputStream = uri.toURL().openStream()){
+//            urlInputStream.transferTo(System.out);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        Path jsonPath = Path.of("files/data/USPopulationByState.txt");
+//        try(InputStreamReader reader = new InputStreamReader(uri.toURL().openStream());
+//        BufferedWriter writer = Files.newBufferedWriter(jsonPath)){
+//            reader.transferTo(writer);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
 //    public static File getFile(){
