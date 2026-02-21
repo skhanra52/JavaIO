@@ -57,7 +57,7 @@ public class ManagingFile {
          While creating "newPath1" we have to remember that the Files.move() does not create sub directory. So initially
          when we run the Files.move() with "newPath1" holds the Path.of("files/students-activity.json") it actually
          will throw a NoSuchFileException. So we have to make sure the directory/subdirectories are present before
-         invoking move with subdirectory. It throws NoSucFileException exception.
+         invoking move() method with subdirectory. It throws NoSuchFileException exception.
 
          For this we have to check and move the files which can be done using "getParent()" method.
          Files.createDirectories(newPath1.getParent());
@@ -97,13 +97,24 @@ public class ManagingFile {
 
         /*
          Using Files.move() rename directories.
+         Files.move(source, target, REPLACE_EXISTING):
+            -> it works only if source(ie, fileDir) is exist,
+            -> Renames the source(ie, fileDir) to target(ie, resourcesDir).
+            -> If target already exist, it tries to replace it.
+            -> Files.move() works as rename only when both source and target are in same directory and target is empty.
+               If the target is empty but located in the different directory then it will move the source to target.
+               In that case it's no longer renaming the source.
          */
 
         Path fileDir = Path.of("files");
         Path resourcesDir = Path.of("resources");
 //        try{
-//            Files.move(fileDir,resourcesDir, StandardCopyOption.REPLACE_EXISTING); // replacing existing if exist
-//            System.out.println("Directory has been renamed");
+//            // Replaces "resourcesDir" if it is already exist and empty.
+//            // If the "resourcesDir" is non-empty then it will "throw DirectoryNotEmptyException".
+//            if(Files.exists(fileDir)) {
+//                Files.move(fileDir,resourcesDir, StandardCopyOption.REPLACE_EXISTING);
+//                System.out.println("Directory has been renamed");
+//            }
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
@@ -169,6 +180,34 @@ public class ManagingFile {
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
+
+        // Example of creating public folder and deleting it
+        Path path = creatingDirectory();
+        Path newDir = path.resolve(Path.of("public"));
+        try {
+            Path publicDir = Path.of("");
+            if(!Files.exists(newDir)) {
+                publicDir = Files.createDirectory(newDir);
+                System.out.println("newDir: " + publicDir.toString());
+            }
+            // Deleting "public" folder
+            try(Stream<Path> walk = Files.walk(publicDir)){
+                    walk.sorted(Comparator.reverseOrder())
+                        .forEach(folder -> {
+                                System.out.println(folder);
+                                System.out.println(folder.getFileName().toString().equals("public"));
+                                try {
+                                    Files.deleteIfExists(folder);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                        });
+            } catch (RuntimeException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 //    public static File getFile(){
@@ -246,5 +285,10 @@ public class ManagingFile {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static Path creatingDirectory(){
+        System.out.println(new File("").getAbsolutePath());
+        return Path.of("").toAbsolutePath();
     }
 }
