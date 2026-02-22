@@ -11,18 +11,6 @@ public class ManagingFile {
 
     public static void main(String[] args) {
 
-//        System.out.println("This section is just for experiment");
-//        File file = getFile();
-//        System.out.println("Checking file path:"+file.getAbsolutePath());
-//        try {
-//            List<String> fileContent = Files.readAllLines(Path.of("students.json"));
-//            System.out.println(Files.readAllLines(Path.of("students.json")));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println();
-
-        //-------------------------------------------------------------------
         File oldFile = new File("students.json");
         File newFile = new File("students-activity.json");
 //        if(oldFile.exists()){
@@ -151,14 +139,14 @@ public class ManagingFile {
          */
         // Setup BufferReader for the student-activity.json which is under sub folder of files.
 
-        try(BufferedReader reader = new BufferedReader(new FileReader("files/Data/students-activity.json"));
-            PrintWriter writer = new PrintWriter("student-backup.json")){
-            // it's actually creating student-backup.json and copying the file's contents to it, which we can do it
-            // using Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING)
-            reader.transferTo(writer);
-        }catch (IOException e){
-            throw new RuntimeException(e);
-        }
+//        try(BufferedReader reader = new BufferedReader(new FileReader("files/Data/students-activity.json"));
+//            PrintWriter writer = new PrintWriter("student-backup.json")){
+//            // it's actually creating student-backup.json and copying the file's contents to it, which we can do it
+//            // using Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING)
+//            reader.transferTo(writer);
+//        }catch (IOException e){
+//            throw new RuntimeException(e);
+//        }
 
         /*
          Another example of transferTo() method.
@@ -181,41 +169,62 @@ public class ManagingFile {
 //            throw new RuntimeException(e);
 //        }
 
-        // Example of creating public folder and deleting it
-        Path path = creatingDirectory();
-        Path newDir = path.resolve(Path.of("public"));
+        /*
+         -> Create a directory at the root of your IntelliJ project named "public" in the current working directory.
+         -> Inside "public" create a subdirectory named "assets".
+         -> Inside "assets" create another subdirectory called "icons".
+         -> Create a process that will generate an index.txt file for each directory.
+                -> In each of the directories ("public", "assents" and "icons"), create an index.txt file.
+                -> In each index.txt file, list all the content in the current directory, with full path and the date
+                   each time was created. This should be recursive. The index.txt file of the parent should contain all
+                   items that are listed in the index.txt of child.
+         -> Next, make a copy of the index.txt in each sub folder.
+         -> After you have created these copies, run your code to regenerate each index.txt file, and verify your backup
+            copies are listed there.
+         */
+
+        // Manually creating each parent directory by using Files.createDirectory() method.
+//        Path root = Path.of("").toAbsolutePath(); // Gives the project root absolute path
+//        Path publicDir = root.resolve(Path.of("public"));
+//        Path assetsDir = publicDir.resolve(Path.of("assets"));
+//        Path iconsDir = assetsDir.resolve(Path.of("icons"));
+//        try {
+//            if(!Files.exists(publicDir)) {
+//                Files.createDirectory(publicDir);
+//                System.out.println("created : " + publicDir);
+//            }
+//            if(!Files.exists(assetsDir)){
+//                Files.createDirectory(assetsDir);
+//            }
+//            if(!Files.exists(iconsDir)){
+//                Files.createDirectory(iconsDir);
+//            }
+//            // Deleting "public" folder in case we need to recreate, this is for testing.
+////            recurseDeleteWalk(publicDir);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        /*
+         Here is the Professional version to create directories using Files.createDirectories().
+         The main difference between Files.createDirectories() and Files.createDirectory() methods are
+         1. Files.createDirectory() does not create parents while Files.createDirectories() does.
+         2. Files.createDirectory() fails if the target directory is existed,  where Files.createDirectories() does
+            not fails if the directories are exist.
+         */
+//        Path root = Path.of("").toAbsolutePath();
+//        Path iconsDir = root.resolve("public")
+//                .resolve("assets")
+//                .resolve("icons");
+        // OR
+        Path iconsDir = Path.of("public", "assets", "icons");
         try {
-            Path publicDir = Path.of("");
-            if(!Files.exists(newDir)) {
-                publicDir = Files.createDirectory(newDir);
-                System.out.println("newDir: " + publicDir.toString());
-            }
-            // Deleting "public" folder
-            try(Stream<Path> walk = Files.walk(publicDir)){
-                    walk.sorted(Comparator.reverseOrder())
-                        .forEach(folder -> {
-                                System.out.println(folder);
-                                System.out.println(folder.getFileName().toString().equals("public"));
-                                try {
-                                    Files.deleteIfExists(folder);
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                        });
-            } catch (RuntimeException e) {
-                throw new RuntimeException(e);
-            }
+            Files.createDirectories(iconsDir); // does not fail if directory exist, so no explicit checks.
+            System.out.println("Directories created (if not already present): " + iconsDir);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
-//    public static File getFile(){
-//        System.out.println("cwd: "+ new File("").getAbsolutePath());
-//        String cwd = new File("").getAbsolutePath();
-//
-//        return new File("students.json");
-//    }
 
     public static void resourceCopy(Path source, Path target) throws IOException{
         Files.copy(source,target, StandardCopyOption.REPLACE_EXISTING); // to avoid DirectoryNotEmptyException
@@ -229,30 +238,16 @@ public class ManagingFile {
                        throw new RuntimeException(e);
                    }
                });
-           } catch (IOException e) {
-               throw new RuntimeException(e);
            }
         }
     }
 
-    public static void deleteResource(Path target) throws IOException{
-        if(Files.isDirectory(target)){
-            try(Stream<Path> path = Files.list(target)){
-                path.toList().forEach(path1 -> {
-                    try {
-                        deleteResource(path1);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
-        }
-        Files.deleteIfExists(target);
-    }
-
+    /**
+     * Recursive way to delete all the subdirectories and target directory.
+     * @param target this is the directory which has to be deleted.
+     * @throws IOException if the directory is missing.
+     */
     public static void recurseDelete(Path target) throws IOException{
-        System.out.println(target.toAbsolutePath());
-        Path absolutePath = target.toAbsolutePath();
         if(Files.isDirectory(target)){
            try(Stream<Path> files = Files.list(target)) { // navigating path through Files.List()
                     files.forEach(p -> {
@@ -269,26 +264,20 @@ public class ManagingFile {
 
     /**
      * Correct Version (Professional Way)
-     * @param target
-     * @throws IOException
+     * @param target this is target to which source will be copied.
+     * @throws IOException if the source is mission.
      */
     public static void recurseDeleteWalk(Path target) throws IOException{
         try(Stream<Path> walk = Files.walk(target)){ // Navigating path through Files.walk()
             walk.sorted(Comparator.reverseOrder()) // deleting child first
-                .forEach(p -> {
+                .forEach(folder -> {
                     try{
-                        Files.delete(p);
+                        Files.deleteIfExists(folder);
+                        System.out.println("Deleted the  ("+folder +") directory");
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
-    }
-
-    public static Path creatingDirectory(){
-        System.out.println(new File("").getAbsolutePath());
-        return Path.of("").toAbsolutePath();
     }
 }
