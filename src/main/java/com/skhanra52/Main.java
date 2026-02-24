@@ -57,10 +57,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.time.Instant;
 import java.util.Map;
 
@@ -121,12 +118,12 @@ public class Main {
            It's an abstract representation of the file, and it does not contain any of the actual data from the file.
 
            A File Resource, on the other hand, is the actual data from the file.
-           It is stored on desk, and it can be accessed by the operating system and by application.
+           It is stored on disk, and it can be accessed by the operating system and by application.
 
          */
 
         File file = getFile();
-        System.out.println(file.getAbsolutePath());
+        System.out.println("From file.getAbsolutePath() method: "+file.getAbsolutePath());
         if(!file.exists()){
             System.out.println("Can't run until the file is exist");
             return;
@@ -147,20 +144,25 @@ public class Main {
 
         // using nio2 ------------------------
         Path path = Paths.get("files/testing2.csv");
+        Path path2 = Paths.get("files","testing2.csv"); // we can write like this as well
+//         Path path3 = Path.of("files/testing2.csv"); // We can write like this as well
+//         Path path3 = Path.of("files","testing2.csv"); // We can write like this as well
         System.out.println(file.getAbsolutePath());
-        if(!Files.exists(path)){
+        if(!Files.exists(path2)){
             System.out.println("2. Can't run until the file is exist");
             return;
         }
         System.out.println("2. We are good to go");
 
 
-        useFile("files/testing2.csv"); // It read the existing file from the directory. It is taking file name as param.
-        usePath("pathFile.txt"); // It has created the pathFile.txt in the first run. It actually takes path as param.
+        // It read the existing file from the directory. It is taking file name as param.
+        useFile("files/testing2.csv");
+        // It has created the pathFile.txt in the first run. It actually takes path as param.
+        usePath("pathFile.txt");
         /*
           In the above, useFile() method takes the "file name" as an argument and uses the old File class after
           instantiate the File object. This is the older version of checking whether the file exist or not, creating
-          files etc.
+          file etc.
           In the other hand, we also have path, usePath() method takes the path as an argument and directly uses the
           File static methods which are all takes path as an argument and perform all the common functions.
 
@@ -222,10 +224,18 @@ public class Main {
 
     private static File getFile() {
         System.out.println("Current working directory (cwd): "+new File("").getAbsolutePath());
-        // Listing the root directory.
+
+        // Listing the root directory using Legacy java.io.File API.
         for(File f : File.listRoots()){
             System.out.println("Root directory: "+f);
         }
+
+        // Listing the root directory using Legacy java.nio.file API.
+        FileSystem fileSystem = FileSystems.getDefault(); // there is s after FileSystem.
+        for(Path root : fileSystem.getRootDirectories()){
+            System.out.println("Root Directory: "+root);
+        }
+
 //        String fileName = "files/testing.csv";
         String fileName = "testing.csv";
         String fileName2 = "files/testing2.csv";
@@ -252,7 +262,7 @@ public class Main {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
             }
             System.out.println("May be I would log something either way...");
@@ -282,14 +292,14 @@ public class Main {
     }
 
     // used older File type
-    private static void useFile(String filename){
-        File file = new File(filename);
+    private static void useFile(String fileName){
+        File file = new File(fileName);
         boolean fileExist = file.exists();
 
-        System.out.printf("File '%s' %s %n", filename, fileExist? "exists.":"does not exist.");
+        System.out.printf("File '%s' %s %n", fileName, fileExist? "exists.":"does not exist.");
 
         if(fileExist){
-            System.out.println("Deleting the file: "+filename);
+            System.out.println("Deleting the file: "+fileName);
             fileExist = !file.delete();
         }
 
@@ -299,21 +309,21 @@ public class Main {
             } catch (IOException e) {
                 System.out.println("Something went wrong.");
             }
-            System.out.println("Created file: "+filename);
+            System.out.println("Created file: "+fileName);
             if(file.canWrite()){
                 System.out.println("Would write to file here..");
             }
         }
     }
 
-    private static void usePath(String filename){
-        Path path = Path.of(filename);
+    private static void usePath(String fileName){
+        Path path = Path.of(fileName);
         boolean fileExist = Files.exists(path);
 
-        System.out.printf("File '%s' %s %n", filename, fileExist? "exists.":"does not exist.");
+        System.out.printf("File '%s' %s %n", fileName, fileExist? "exists.":"does not exist.");
 
         if(fileExist){
-            System.out.println("Deleting the file: "+filename);
+            System.out.println("Deleting the file: "+fileName);
             try {
                Files.delete(path);
                 fileExist = false;
@@ -325,7 +335,7 @@ public class Main {
         if(!fileExist){
             try {
                 Files.createFile(path);
-                System.out.println("Created file: "+filename);
+                System.out.println("Created file: "+fileName);
                 if(Files.isWritable(path)){
                     Files.writeString(path, """
                             I am writing some text here.
@@ -383,8 +393,11 @@ public class Main {
         try{
             Path parent = path.getParent();
             if(!Files.exists(parent)){
-                // Files.createDirectory(parent); // creates single directory, ex: "files/testing3.csv", see in main method
-                // below line of code creates the entire folders(directories)which are not exist along with file testing4.csv.
+                // creates single directory, ex: "files/testing3.csv", see in main method
+                // Files.createDirectory(parent);
+
+                // below line of code creates the entire folders(directories)which are not exist along
+                // with file testing4.csv.
                 Files.createDirectories(parent);
             }
             // creating and writing in the file using single line. First argument is path, second argument is the string

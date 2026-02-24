@@ -67,7 +67,7 @@ public class ManagingFile {
 //        Path oldPath1 = Path.of("students.json");
 //        Path newPath1 = Path.of("files/students-activity.json");
 //        try{
-//            Files.createDirectories(newPath1.getParent()); // creates  the directory if not exist.
+//            Files.createDirectories(newPath1.getParent()); // creates  the directory including parent if not exist.
 //            Files.move(oldPath1,newPath1);
 //            System.out.println("Path renamed Successfully");
 //        } catch (IOException e) {
@@ -176,15 +176,15 @@ public class ManagingFile {
          -> Create a process that will generate an index.txt file for each directory.
                 -> In each of the directories ("public", "assents" and "icons"), create an index.txt file.
                 -> In each index.txt file, list all the content in the current directory, with full path and the date
-                   each time was created. This should be recursive. The index.txt file of the parent should contain all
-                   items that are listed in the index.txt of child.
+                   each time was created. This should be recursive.
+                -> The index.txt file of the parent should contain all items that are listed in the index.txt of child.
          -> Next, make a copy of the index.txt in each sub folder.
          -> After you have created these copies, run your code to regenerate each index.txt file, and verify your backup
             copies are listed there.
          */
 
         // Manually creating each parent directory by using Files.createDirectory() method.
-//        Path root = Path.of("").toAbsolutePath(); // Gives the project root absolute path
+//        Path root = Path.of("").toAbsolutePath(); // Gives the project root absolute path.
 //        Path publicDir = root.resolve(Path.of("public"));
 //        Path assetsDir = publicDir.resolve(Path.of("assets"));
 //        Path iconsDir = assetsDir.resolve(Path.of("icons"));
@@ -200,7 +200,7 @@ public class ManagingFile {
 //                Files.createDirectory(iconsDir);
 //            }
 //            // Deleting "public" folder in case we need to recreate, this is for testing.
-////            recurseDeleteWalk(publicDir);
+//            directoryDeleteWalk(publicDir);
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
@@ -267,7 +267,7 @@ public class ManagingFile {
      * @param target this is target to which source will be copied.
      * @throws IOException if the source is mission.
      */
-    public static void recurseDeleteWalk(Path target) throws IOException{
+    public static void directoryDeleteWalk(Path target) throws IOException{
         try(Stream<Path> walk = Files.walk(target)){ // Navigating path through Files.walk()
             walk.sorted(Comparator.reverseOrder()) // deleting child first
                 .forEach(folder -> {
