@@ -123,7 +123,11 @@ public class Main {
          */
 
         File file = getFile();
-        System.out.println("From file.getAbsolutePath() method: "+file.getAbsolutePath());
+        String absolutePath = file.getAbsolutePath();
+        System.out.println("Absolute Path: "+absolutePath);
+        Path convertedPath = file.toPath().toAbsolutePath();
+        System.out.println("Converted File to Path and get Absolute Path in NIO way"+convertedPath);
+        System.out.println("Current working directory(CWD): "+Path.of("").toAbsolutePath());
         if(!file.exists()){
             System.out.println("Can't run until the file is exist");
             return;
@@ -392,19 +396,22 @@ public class Main {
     private static void losStatement(Path path){
         try{
             Path parent = path.getParent();
-            if(!Files.exists(parent)){
+//            if(!Files.exists(parent)){
                 // creates single directory, ex: "files/testing3.csv", see in main method
                 // Files.createDirectory(parent);
 
-                // below line of code creates the entire folders(directories)which are not exist along
-                // with file testing4.csv.
+//            }
+
+            // OR below line of code creates the entire folders(directories)which are not exist along  with file
+            // testing4.csv.
                 Files.createDirectories(parent);
-            }
             // creating and writing in the file using single line. First argument is path, second argument is the string
             // that will be printed. This also takes 3rd argument which is a variable length option types.
             // Here, we are using two options StandardOpenOption.CREATE, StandardOpenOption.APPEND
-            Files.writeString(path, Instant.now() +": Hello File world\n",
-                    StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            Files.writeString(path,
+                    Instant.now() +": Hello File world\n",
+                    StandardOpenOption.CREATE,  // creates file if the file does not exist
+                    StandardOpenOption.APPEND); // append to end of the file which is created or to existing file.
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

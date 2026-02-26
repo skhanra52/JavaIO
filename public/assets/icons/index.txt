@@ -1,0 +1,6 @@
+Directory            : icons
+Creation Time        : 2026-02-22T01:44:14Z
+Size                 : 96 bytes
+IsDirectory          : true
+IsRegularFile        : false
+========================================================

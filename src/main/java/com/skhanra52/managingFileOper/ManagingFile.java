@@ -1,9 +1,12 @@
 package com.skhanra52.managingFileOper;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
@@ -169,7 +172,7 @@ public class ManagingFile {
 //            throw new RuntimeException(e);
 //        }
 
-        /*
+        /*----------------------------------------------------------------------------------------------------------
          -> Create a directory at the root of your IntelliJ project named "public" in the current working directory.
          -> Inside "public" create a subdirectory named "assets".
          -> Inside "assets" create another subdirectory called "icons".
@@ -182,28 +185,6 @@ public class ManagingFile {
          -> After you have created these copies, run your code to regenerate each index.txt file, and verify your backup
             copies are listed there.
          */
-
-        // Manually creating each parent directory by using Files.createDirectory() method.
-//        Path root = Path.of("").toAbsolutePath(); // Gives the project root absolute path.
-//        Path publicDir = root.resolve(Path.of("public"));
-//        Path assetsDir = publicDir.resolve(Path.of("assets"));
-//        Path iconsDir = assetsDir.resolve(Path.of("icons"));
-//        try {
-//            if(!Files.exists(publicDir)) {
-//                Files.createDirectory(publicDir);
-//                System.out.println("created : " + publicDir);
-//            }
-//            if(!Files.exists(assetsDir)){
-//                Files.createDirectory(assetsDir);
-//            }
-//            if(!Files.exists(iconsDir)){
-//                Files.createDirectory(iconsDir);
-//            }
-//            // Deleting "public" folder in case we need to recreate, this is for testing.
-//            directoryDeleteWalk(publicDir);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
 
         /*
          Here is the Professional version to create directories using Files.createDirectories().
@@ -219,8 +200,7 @@ public class ManagingFile {
         // OR
         Path iconsDir = Path.of("public", "assets", "icons");
         try {
-            Files.createDirectories(iconsDir); // does not fail if directory exist, so no explicit checks.
-            System.out.println("Directories created (if not already present): " + iconsDir);
+            createIndexesAtEachLevel(iconsDir);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -278,6 +258,44 @@ public class ManagingFile {
                         throw new RuntimeException(e);
                     }
                 });
+        }
+    }
+
+    public static void createIndexesAtEachLevel(Path path) throws IOException {
+
+        Files.createDirectories(path); // does not fail if directory exist, so no explicit checks.
+
+        Path current = path.getRoot() == null ? Path.of("") : path.getRoot();
+        System.out.println("Current"+current);
+
+        for(Path part: path){
+            current = current.resolve(part); // concatenating the path
+            Path indexFile = current.resolve("index.txt"); // concatenating the index.txt with previous path
+            System.out.println(indexFile);
+
+            BasicFileAttributes attrs =  Files.readAttributes(current, BasicFileAttributes.class);
+            String content = """
+                    %-20s : %s
+                    %-20s : %s
+                    %-20s : %d bytes
+                    %-20s : %b
+                    %-20s : %b
+                    ========================================================
+                    """.formatted(
+                            "Directory", current.getFileName(),
+                    "Creation Time", attrs.creationTime(),
+                    "Size", attrs.size(),
+                    "IsDirectory", attrs.isDirectory(),
+                    "IsRegularFile", attrs.isRegularFile()
+            );
+
+            System.out.println("attr:\n"+content);
+
+            // create the file only if it does not exist
+            Files.writeString(indexFile,
+                    content,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
         }
     }
 }
