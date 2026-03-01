@@ -2,12 +2,12 @@ package com.skhanra52.managingFileOper;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ManagingFile {
@@ -172,6 +172,14 @@ public class ManagingFile {
 //            throw new RuntimeException(e);
 //        }
 
+        /*----------------------------------------------------
+        Where do we use Files.list(),Files.walk() and for loop?
+
+         for (Path part : path) → when working with path structure itself
+         Files.walk() → when exploring real filesystem contents
+         Files.list() → when checking directory children
+         */
+
         /*----------------------------------------------------------------------------------------------------------
          -> Create a directory at the root of your IntelliJ project named "public" in the current working directory.
          -> Inside "public" create a subdirectory named "assets".
@@ -199,10 +207,29 @@ public class ManagingFile {
 //                .resolve("icons");
         // OR
         Path iconsDir = Path.of("public", "assets", "icons");
-        try {
-            createIndexesAtEachLevel(iconsDir);
+//        try {
+//            createIndexesAtEachLevel(iconsDir);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        // Here is the other way of creating index.txt and writing file
+        try{
+            Files.createDirectories(iconsDir);
+            generateIndexFile(iconsDir.getName(0));
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+        // Creating backup of each index file.
+        for (int i= 1; i <= iconsDir.getNameCount(); i++){
+            Path indexPath = iconsDir.subpath(0, i).resolve("index.txt");
+            Path backupPath = iconsDir.subpath(0, i).resolve("indexCopy.txt");
+            try {
+                Files.copy(indexPath, backupPath, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
         }
     }
 
@@ -277,11 +304,13 @@ public class ManagingFile {
             String content = """
                     %-20s : %s
                     %-20s : %s
+                    %-20s : %s
                     %-20s : %d bytes
                     %-20s : %b
                     %-20s : %b
                     ========================================================
                     """.formatted(
+                            "Path", current,
                             "Directory", current.getFileName(),
                     "Creation Time", attrs.creationTime(),
                     "Size", attrs.size(),
@@ -293,9 +322,50 @@ public class ManagingFile {
 
             // create the file only if it does not exist
             Files.writeString(indexFile,
-                    content,
+                    Instant.now() +"\n" + content,
                     StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING);
+            //Creating backup for the index.txt
+            Path indexFileBackup = current.resolve("indexBackup.txt");
+            if(Files.exists(indexFileBackup, LinkOption.NOFOLLOW_LINKS)) {
+                Files.copy(indexFile, indexFileBackup, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("Backup Exist: "+indexFileBackup);
+            }else{
+                System.out.println("Backup missing: "+indexFileBackup);
+            }
+        }
+    }
+
+    public static void generateIndexFile(Path startingPath) throws IOException{
+        Path indexFile = startingPath.resolve("index.txt");
+        try(Stream<Path> contents = Files.find(startingPath, Integer.MAX_VALUE,
+                (path, attr) -> true )) {
+
+            String fileContents = contents
+                    .map(path -> path.toAbsolutePath().toString())
+                    .collect(Collectors.joining(
+                            System.lineSeparator(),
+                            "Directory Contents: " + System.lineSeparator(),
+                            System.lineSeparator() + "Generated: " + LocalDateTime.now()
+                    ));
+            Files.writeString(indexFile, fileContents,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // generating index.txt recursively
+        try (Stream<Path> contents = Files.list(startingPath)) {
+            contents.filter(Files::isDirectory)
+                    .toList()
+                    .forEach(dir -> {
+                        try{
+                            generateIndexFile(dir);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } );
         }
     }
 }

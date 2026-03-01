@@ -1,6 +1,19 @@
+2026-02-27T01:41:25.218277Z
+Path                 : public
 Directory            : public
 Creation Time        : 2026-02-22T01:40:06Z
-Size                 : 128 bytes
+Size                 : 160 bytes
 IsDirectory          : true
 IsRegularFile        : false
 ========================================================
+Directory Contents: 
+/Users/sumankalyankhanra/Desktop/Java/FileExceptions/public
+/Users/sumankalyankhanra/Desktop/Java/FileExceptions/public/index.txt
+/Users/sumankalyankhanra/Desktop/Java/FileExceptions/public/indexBackup.txt
+/Users/sumankalyankhanra/Desktop/Java/FileExceptions/public/assets
+/Users/sumankalyankhanra/Desktop/Java/FileExceptions/public/assets/index.txt
+/Users/sumankalyankhanra/Desktop/Java/FileExceptions/public/assets/icons
+/Users/sumankalyankhanra/Desktop/Java/FileExceptions/public/assets/icons/index.txt
+/Users/sumankalyankhanra/Desktop/Java/FileExceptions/public/assets/icons/indexBackup.txt
+/Users/sumankalyankhanra/Desktop/Java/FileExceptions/public/assets/indexBackup.txt
+Generated: 2026-02-28T06:46:43.703643

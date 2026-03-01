@@ -1,6 +1,6 @@
-2026-02-27T01:41:25.229354Z
-Path                 : public/assets
-Directory            : assets
+2026-02-27T01:41:25.218277Z
+Path                 : public
+Directory            : public
 Creation Time        : 2026-02-22T01:40:06Z
 Size                 : 160 bytes
 IsDirectory          : true
